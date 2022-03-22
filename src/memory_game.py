@@ -82,6 +82,8 @@ class MemoryGame:
             self.print(table=table)
             time.sleep(1)
             self.print()
+        elif right == -2:
+            self.print("Position already played")
 
         self.playing()
 
@@ -112,7 +114,7 @@ class MemoryGame:
             raise Exception(f"Height number cannot be greater than {self.height}")
 
         if f'{width}{height}' in self.positions:
-            raise Exception("Position already played")
+            return False, self.game_table, self.points, -2
 
         r = self.result_table[height][width]
         if self.last is None:
