@@ -8,9 +8,7 @@ logging.getLogger().setLevel(logging.DEBUG)
 
 if __name__ == "__main__":
     try:
-        logging.info("Init game...")
-
-        game = MemoryGame(3, 4)
+        game = MemoryGame(4, 4)
         game.start()
     except KeyboardInterrupt:
         # quit
