@@ -20,9 +20,9 @@ if __name__ == "__main__":
             [1, 0],
             [1, 1],
         ]:
-            _, o, p, _ = game.next(i[0], i[1])
+            f, o, p, a = game.next(i[0], i[1])
 
-            print(f'--------------- Pontos: {p}')
+            print(f'-- Finished: {f} - Acertou: {a} - Pontos: {p}')
 
             for line in o:
                 print('  '.join(map(str, line)))
