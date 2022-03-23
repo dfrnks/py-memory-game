@@ -12,71 +12,52 @@ logging.basicConfig(format='%(message)s')
 logging.getLogger().setLevel(logging.DEBUG)
 
 
-def play(i):
-    w = 8
-    h = 8
+def play(w, h, i):
     id = uuid.uuid4()
     start_time = time.time()
-    df = pd.DataFrame(columns=['id', 'width', 'height', 'x', 'y', 'winning', 'acerto', 'pontos'])
 
-    game = MemoryGame(w, h)
+    game = MemoryGame(w, h, '0')
     game.start()
 
     winning = False
+    l = []
     while not winning:
         x = random.randint(0, w-1)
         y = random.randint(0, h-1)
 
-        winning, o, p, a = game.next(x, y)
+        winning, table, pontos, acerto = game.next(x, y)
 
-        gInfo = pd.DataFrame({
-            'id': [id],
-            'time': [time.time()],
-            'width': [w],
-            'height': [h],
-            'x': [x],
-            'y': [y],
-            'winning': [winning],
-            'acerto': [a],
-            'pontos': [p]
-        })
+        l.append([
+            id,
+            w,
+            h,
+            x,
+            y,
+            winning,
+            acerto,
+            pontos,
+            time.time(),
+            table
+        ])
 
-        df = pd.concat([df, gInfo], ignore_index=True, axis=0)
+    print("--- {} item. {} seconds. {} Pontos ---".format(i, (time.time() - start_time), pontos))
 
-    if os.path.exists('jogos.csv'):
-        file = pd.read_csv('jogos.csv')
-    else:
-        file = pd.DataFrame()
-
-    df = pd.concat([file, df], ignore_index=True, axis=0)
-
-    df.to_csv('jogos.csv', index=False)
-
-    print("--- {} item. {} seconds. {} Pontos ---".format(i, (time.time() - start_time), p))
+    return pd.DataFrame(l, columns=['id', 'width', 'height', 'x', 'y', 'winning', 'acerto', 'pontos', 'time', 'table'])
 
 
 if __name__ == "__main__":
     try:
-        for i in range(100):
-            play(i)
-        # game = MemoryGame(4, 4)
-        # game.start()
-        # # game.playing()
-        #
-        # for i in [
-        #     [0, 0],
-        #     [0, 1],
-        #     [0, 2],
-        #     [0, 3],
-        #     [1, 0],
-        #     [1, 1],
-        # ]:
-        #     f, o, p, a = game.next(i[0], i[1])
-        #
-        #     print(f'-- Finished: {f} - Acertou: {a} - Pontos: {p}')
-        #
-        #     for line in o:
-        #         print('  '.join(map(str, line)))
+        if os.path.exists('jogos.csv'):
+            file = pd.read_csv('jogos.csv')
+        else:
+            file = pd.DataFrame()
+
+        for i in range(1000):
+            df = play(8, 8, i)
+
+            file = pd.concat([file, df], ignore_index=True, axis=0)
+
+        file.to_csv('jogos.csv', index=False)
 
     except KeyboardInterrupt:
         sys.exit()
