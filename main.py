@@ -47,8 +47,9 @@ def play(w, h, i):
 
 if __name__ == "__main__":
     try:
-        if os.path.exists('jogos.csv'):
-            file = pd.read_csv('jogos.csv')
+        file_path = 'jogos-10x10.csv'
+        if os.path.exists(file_path):
+            file = pd.read_csv(file_path)
         else:
             file = pd.DataFrame()
 
@@ -57,7 +58,7 @@ if __name__ == "__main__":
 
             file = pd.concat([file, df], ignore_index=True, axis=0)
 
-        file.to_csv('jogos.csv', index=False)
+        file.to_csv(file_path, index=False)
 
     except KeyboardInterrupt:
         sys.exit()
