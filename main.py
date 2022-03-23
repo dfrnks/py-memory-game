@@ -39,20 +39,27 @@ def play(w, h, file_path, i, j):
             str(time.time())
         ])
 
+        # if (time.time() - start_time) % 2:
+        #     with open(file_path, mode='a', encoding='utf-8') as myfile:
+        #         myfile.write('\n'.join(','.join(l) for l in list) + '\n')
+        #     list = []
+
     print("--- {}-{} item. {} seconds. {} Pontos ---".format(j, i, (time.time() - start_time), pontos))
 
     with open(file_path, mode='a', encoding='utf-8') as myfile:
-        myfile.write('\n'.join(','.join(l) for l in list))
+        myfile.write('\n'.join(','.join(l) for l in list) + '\n')
 
 
 if __name__ == "__main__":
     try:
-        size = 10
+        size = 8
         file_path = f'jogos-{size}x{size}-full-001.csv'
 
         if not os.path.exists(file_path):
             with open(file_path, mode='a', encoding='utf-8') as myfile:
                 myfile.write('id,width,height,x,y,winning,acerto,pontos,time\n')
+
+        # play(size, size, file_path, 0, 0)
 
         for j in range(500):
             threads = [None] * 10
