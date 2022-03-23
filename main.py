@@ -5,6 +5,7 @@ import time
 import uuid
 import pandas as pd
 import os
+import threading
 
 from src.memory_game import MemoryGame
 
@@ -12,53 +13,63 @@ logging.basicConfig(format='%(message)s')
 logging.getLogger().setLevel(logging.DEBUG)
 
 
-def play(w, h, i):
-    id = uuid.uuid4()
+def play(w, h, list, i, j):
+    id = str(uuid.uuid4())
     start_time = time.time()
 
     game = MemoryGame(w, h, '0')
     game.start()
 
     winning = False
-    l = []
     while not winning:
         x = random.randint(0, w-1)
         y = random.randint(0, h-1)
 
         winning, table, pontos, acerto = game.next(x, y)
 
-        l.append([
-            id,
-            w,
-            h,
-            x,
-            y,
-            winning,
-            acerto,
-            pontos,
-            time.time(),
-            table
+        list.append([
+            str(id),
+            str(w),
+            str(h),
+            str(x),
+            str(y),
+            str(winning),
+            str(acerto),
+            str(pontos),
+            str(time.time())
         ])
 
-    print("--- {} item. {} seconds. {} Pontos ---".format(i, (time.time() - start_time), pontos))
+        # print("--- {} item. {} seconds. {} Pontos ---".format(i, (time.time() - start_time), pontos))
+        # for line in table:
+        #     logging.info('  '.join(map(str, line)))
 
-    return pd.DataFrame(l, columns=['id', 'width', 'height', 'x', 'y', 'winning', 'acerto', 'pontos', 'time', 'table'])
+    print("--- {}-{} item. {} seconds. {} Pontos ---".format(j, i, (time.time() - start_time), pontos))
+
+    # return pd.DataFrame(l, columns=['id', 'width', 'height', 'x', 'y', 'winning', 'acerto', 'pontos', 'time'])
 
 
 if __name__ == "__main__":
     try:
-        file_path = 'jogos-10x10.csv'
-        if os.path.exists(file_path):
-            file = pd.read_csv(file_path)
-        else:
-            file = pd.DataFrame()
+        size = 10
+        file_path = f'jogos-{size}x{size}-full.csv'
 
-        for i in range(1000):
-            df = play(8, 8, i)
+        if not os.path.exists(file_path):
+            with open(file_path, mode='a', encoding='utf-8') as myfile:
+                myfile.write('id,width,height,x,y,winning,acerto,pontos,time\n')
 
-            file = pd.concat([file, df], ignore_index=True, axis=0)
+        for j in range(100):
+            threads = [None] * 50
+            results = []
 
-        file.to_csv(file_path, index=False)
+            for i in range(len(threads)):
+                threads[i] = threading.Thread(target=play, args=(size, size, results, i, j,))
+                threads[i].start()
+
+            for i in range(len(threads)):
+                threads[i].join(300)
+
+            with open(file_path, mode='a', encoding='utf-8') as myfile:
+                myfile.write('\n'.join(','.join(line) for line in results))
 
     except KeyboardInterrupt:
         sys.exit()
