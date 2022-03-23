@@ -51,17 +51,17 @@ class MemoryGame:
     def playing(self, message=None):
         self.print(message)
 
-        position = input("Enter the Width Height position (ex: 12):")
+        position = input("Enter the X Y position (ex: 12):")
 
         if len(position) > 2 or len(position) < 2:
             self.playing("Digit two numbers. Ex: 12")
             return
 
-        w = int(position[0]) - 1
-        h = int(position[1]) - 1
+        x = int(position[0]) - 1
+        y = int(position[1]) - 1
 
         try:
-            finished, table, points, right = self.next(width=w, height=h)
+            finished, table, points, right = self.next(x=x, y=y)
 
             if finished:
                 self.print()
@@ -106,29 +106,29 @@ class MemoryGame:
     def start(self):
         self.__createTable()
 
-    def next(self, width: int, height: int) -> [bool, list, int, int]:
-        if width > self.width - 1:
-            raise Exception(f"Width number cannot be greater than {self.width}")
+    def next(self, x: int, y: int) -> [bool, list, int, int]:
+        if x > self.width - 1:
+            raise Exception(f"The X number cannot be greater than {self.width}")
 
-        if height > self.height - 1:
-            raise Exception(f"Height number cannot be greater than {self.height}")
+        if y > self.height - 1:
+            raise Exception(f"The Y number cannot be greater than {self.height}")
 
-        if f'{width}{height}' in self.positions:
+        if f'{x}{y}' in self.positions:
             return False, self.game_table, self.points, -2
 
-        r = self.result_table[height][width]
+        r = self.result_table[y][x]
         if self.last is None:
-            self.last = [height, width]
+            self.last = [y, x]
             self.game_table_copy = copy.deepcopy(self.game_table)
-            self.game_table[height][width] = r
-            self.positions.append(f'{width}{height}')
+            self.game_table[y][x] = r
+            self.positions.append(f'{x}{y}')
             result_table = copy.deepcopy(self.game_table)
 
             return False, result_table, self.points, 0
         elif self.result_table[self.last[0]][self.last[1]] == r:
             self.points += 10
-            self.game_table[height][width] = r
-            self.positions.append(f'{width}{height}')
+            self.game_table[y][x] = r
+            self.positions.append(f'{x}{y}')
             self.last = None
             self.num_errors = 0
 
@@ -143,7 +143,7 @@ class MemoryGame:
         penalty = self.num_errors ** 2
         self.points = self.points - penalty if self.points - penalty >= 0 else 0
 
-        self.game_table[height][width] = r
+        self.game_table[y][x] = r
         result_table = copy.deepcopy(self.game_table)
         self.game_table = copy.deepcopy(self.game_table_copy)
         self.game_table_copy = None
