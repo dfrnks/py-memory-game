@@ -24,7 +24,7 @@ class MemoryGame:
 
         el = (self.width * self.height) / 2
 
-        logging.debug(f'Elements number: {el}')
+        # logging.debug(f'Elements number: {el}')
 
         if el % 2 != 0:
             raise Exception('Width and height is not a par number.')

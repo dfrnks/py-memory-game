@@ -12,15 +12,12 @@ logging.basicConfig(format='%(message)s')
 logging.getLogger().setLevel(logging.DEBUG)
 
 
-def play():
+def play(i):
     w = 8
     h = 8
     id = uuid.uuid4()
     start_time = time.time()
     df = pd.DataFrame(columns=['id', 'width', 'height', 'x', 'y', 'winning', 'acerto', 'pontos'])
-
-    if os.path.exists('jogos.csv'):
-        df = pd.read_csv('jogos.csv')
 
     game = MemoryGame(w, h)
     game.start()
@@ -46,23 +43,22 @@ def play():
 
         df = pd.concat([df, gInfo], ignore_index=True, axis=0)
 
-        # print(f'-- Finished: {winning} - Acertou: {a} - Pontos: {p}')
-        #
-        # for line in o:
-        #     print('  '.join(map(str, line)))
+    if os.path.exists('jogos.csv'):
+        file = pd.read_csv('jogos.csv')
+    else:
+        file = pd.DataFrame()
 
-        # time.sleep(0.4)
+    df = pd.concat([file, df], ignore_index=True, axis=0)
 
     df.to_csv('jogos.csv', index=False)
 
-    print(df[df['id'] == id]['acerto'].value_counts())
-
-    print("--- {} seconds. {} Pontos ---".format((time.time() - start_time), p))
+    print("--- {} item. {} seconds. {} Pontos ---".format(i, (time.time() - start_time), p))
 
 
 if __name__ == "__main__":
     try:
-        play()
+        for i in range(100):
+            play(i)
         # game = MemoryGame(4, 4)
         # game.start()
         # # game.playing()
@@ -83,5 +79,4 @@ if __name__ == "__main__":
         #         print('  '.join(map(str, line)))
 
     except KeyboardInterrupt:
-        # quit
         sys.exit()
