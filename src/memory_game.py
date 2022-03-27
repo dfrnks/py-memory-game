@@ -108,10 +108,10 @@ class MemoryGame:
 
     def next(self, x: int, y: int) -> [bool, list, int, int]:
         if x > self.width - 1:
-            raise Exception(f"The X number cannot be greater than {self.width}")
+            raise Exception(f"The X number cannot be greater than {self.width - 1}")
 
         if y > self.height - 1:
-            raise Exception(f"The Y number cannot be greater than {self.height}")
+            raise Exception(f"The Y number cannot be greater than {self.height - 1}")
 
         if f'{x}{y}' in self.positions:
             return False, self.game_table, self.points, -2
