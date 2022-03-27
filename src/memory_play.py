@@ -1,8 +1,10 @@
+import os
+import copy
 import torch
-from torch import nn
+import random
 import numpy as np
+from torch import nn
 from collections import deque
-import random, datetime, os, copy
 
 
 class Memory:
@@ -52,14 +54,11 @@ class Memory:
         action_idx (int): An integer representing which action Mario will perform
         """
         # EXPLORE
-        # print(np.random.rand() < self.exploration_rate)
-        # print(self.action_dim, np.random.randint(self.action_dim))
         if np.random.rand() < self.exploration_rate:
             action_idx = np.random.randint(self.action_dim)
 
         # EXPLOIT
         else:
-            # state = state.__array__()
             if self.use_cuda:
                 state = torch.tensor(state).cuda()
             else:
@@ -67,8 +66,6 @@ class Memory:
             state = state.unsqueeze(0)
             action_values = self.net(state.float(), model="online")
             action_idx = torch.argmax(action_values, axis=1).item()
-
-            # print(f'Aqui -> {action_idx} -> ' + str(action_values))
 
         # decrease exploration_rate
         self.exploration_rate *= self.exploration_rate_decay
@@ -140,12 +137,13 @@ class Memory:
         # Backpropagate loss through Q_online
         loss = self.update_Q_online(td_est, td_tgt)
 
-        return (td_est.mean().item(), loss)
+        return td_est.mean().item(), loss
 
     def td_estimate(self, state, action):
         current_Q = self.net(state.float(), model="online")[
             np.arange(0, self.batch_size), action
         ]  # Q_online(s,a)
+
         return current_Q
 
     @torch.no_grad()
@@ -155,33 +153,51 @@ class Memory:
         next_Q = self.net(next_state.float(), model="target")[
             np.arange(0, self.batch_size), best_action
         ]
+
         return (reward + (1 - done.float()) * self.gamma * next_Q).float()
 
     def update_Q_online(self, td_estimate, td_target):
         loss = self.loss_fn(td_estimate, td_target)
+
         self.optimizer.zero_grad()
+
         loss.backward()
+
         self.optimizer.step()
+
         return loss.item()
 
     def sync_Q_target(self):
         self.net.target.load_state_dict(self.net.online.state_dict())
 
-    def save(self):
-        save_path = (
-                self.save_dir / f"memory_net_{int(self.curr_step // self.save_every)}.chkpt"
+    def save(self, save_path=None):
+        save_path = save_path if save_path is not None else (
+            self.save_dir / f"memory_net_{int(self.curr_step // self.save_every)}.chkpt"
         )
+
         torch.save(
             dict(model=self.net.state_dict(), exploration_rate=self.exploration_rate),
             save_path,
         )
+
         print(f"MemoryNet saved to {save_path} at step {self.curr_step}")
+
+    def load(self, path):
+        if os.path.exists(path):
+            print("Load network")
+
+            checkpoint = torch.load(path)
+
+            self.exploration_rate = checkpoint['exploration_rate']
+
+            self.net.load_state_dict(checkpoint['model'])
 
 
 class MemoryNet(nn.Module):
-    """mini cnn structure
-      input -> (conv2d + relu) x 3 -> flatten -> (dense + relu) x 2 -> output
-      """
+    """
+    mini cnn structure
+    input -> (conv2d + relu) x 3 -> flatten -> (dense + relu) x 2 -> output
+    """
 
     def __init__(self, input_dim, output_dim):
         super().__init__()
@@ -225,8 +241,6 @@ class MemoryNet(nn.Module):
             p.requires_grad = False
 
     def forward(self, input, model):
-        # input = input.type(torch.LongTensor).cuda()
-
         if model == "online":
             return self.online(input)
         elif model == "target":

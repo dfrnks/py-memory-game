@@ -10,8 +10,6 @@ import copy
 def createTable(width, height, character):
     el = (width * height) / 2
 
-    # logging.debug(f'Elements number: {el}')
-
     if el % 2 != 0:
         raise Exception('Width and height is not a par number.')
 
@@ -48,8 +46,8 @@ class MemoryGameEnv(Env):
         self.reward_range = (-float("inf"), float("inf"))
 
         # Set these in ALL subclasses
-        self.observation_space = spaces.Discrete(self.nS)
-        self.action_space = spaces.Discrete(self.nS)
+        self.observation_space = spaces.Discrete(int(self.nS))
+        self.action_space = spaces.Discrete(int(self.nS))
 
         self.result_table = []
         self.game_table = []
@@ -128,27 +126,21 @@ class MemoryGameEnv(Env):
 
         return self.game_table
 
-    def render(self, table=None, mode="human"):
+    def render(self, table=None, mode='human'):
         outfile = StringIO()
 
         outfile.write(f'-- Memory Game - Points: {self.points} --\n')
+
+        print_table = table if table is not None else self.game_table
+
         line = []
-        if table is not None:
-            for item in table:
-                line.append(item)
+        for item in print_table:
+            line.append(item)
 
-                if len(line) == self.shape[0]:
-                    outfile.write('  '.join(map(str, line)))
-                    outfile.write("\n")
-                    line = []
-        else:
-            for item in self.game_table:
-                line.append(item)
-
-                if len(line) == self.shape[0]:
-                    outfile.write('  '.join(map(str, line)))
-                    outfile.write("\n")
-                    line = []
+            if len(line) == self.shape[0]:
+                outfile.write('  '.join(map(str, line)))
+                outfile.write('\n')
+                line = []
 
         with closing(outfile):
             return outfile.getvalue()

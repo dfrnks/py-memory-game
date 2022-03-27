@@ -1,21 +1,23 @@
 import numpy as np
-import time, datetime
-import matplotlib.pyplot as plt
+import time
+import datetime
 
 
 class MetricLogger:
     def __init__(self, save_dir):
+        self.curr_ep_loss_length = None
+        self.curr_ep_q = None
+        self.curr_ep_loss = None
+        self.curr_ep_length = None
+        self.curr_ep_reward = None
         self.save_log = save_dir / "log"
+
         with open(self.save_log, "w") as f:
             f.write(
                 f"{'Episode':>8}{'Step':>8}{'Epsilon':>10}{'MeanReward':>15}"
                 f"{'MeanLength':>15}{'MeanLoss':>15}{'MeanQValue':>15}"
                 f"{'TimeDelta':>15}{'Time':>20}\n"
             )
-        # self.ep_rewards_plot = save_dir / "reward_plot.jpg"
-        # self.ep_lengths_plot = save_dir / "length_plot.jpg"
-        # self.ep_avg_losses_plot = save_dir / "loss_plot.jpg"
-        # self.ep_avg_qs_plot = save_dir / "q_plot.jpg"
 
         # History metrics
         self.ep_rewards = []
@@ -44,7 +46,7 @@ class MetricLogger:
             self.curr_ep_loss_length += 1
 
     def log_episode(self):
-        "Mark end of episode"
+        """Mark end of episode"""
         self.ep_rewards.append(self.curr_ep_reward)
         self.ep_lengths.append(self.curr_ep_length)
         if self.curr_ep_loss_length == 0:
@@ -98,8 +100,3 @@ class MetricLogger:
                 f"{time_since_last_record:15.3f}"
                 f"{datetime.datetime.now().strftime('%Y-%m-%dT%H:%M:%S'):>20}\n"
             )
-
-        # for metric in ["ep_rewards", "ep_lengths", "ep_avg_losses", "ep_avg_qs"]:
-        #     plt.plot(getattr(self, f"moving_avg_{metric}"))
-        #     plt.savefig(getattr(self, f"{metric}_plot"))
-        #     plt.clf()
