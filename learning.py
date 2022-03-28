@@ -4,11 +4,11 @@ import datetime
 from pathlib import Path
 
 from src import MemoryGameEnv
-from src import Memory
+from src import MemoryAgent
 from src import MetricLogger
 
 
-if __name__ == '__main__':
+def run():
     env = MemoryGameEnv((4, 4))
 
     print(f"Using CUDA: {torch.cuda.is_available()}\n")
@@ -16,7 +16,8 @@ if __name__ == '__main__':
     save_dir = Path("checkpoints") / datetime.datetime.now().strftime("%Y-%m-%dT%H-%M-%S")
     save_dir.mkdir(parents=True)
 
-    memory = Memory(state_dim=(env.action_space.n, env.action_space.n), action_dim=env.action_space.n, save_dir=save_dir)
+    memory = MemoryAgent(state_dim=(env.action_space.n, env.action_space.n), action_dim=env.action_space.n,
+                         save_dir=save_dir)
 
     memory.load('checkpoints/memory_net.chkpt')
 
@@ -58,3 +59,7 @@ if __name__ == '__main__':
             logger.record(episode=e, epsilon=memory.exploration_rate, step=memory.curr_step)
 
     memory.save('checkpoints/memory_net.chkpt')
+
+
+if __name__ == '__main__':
+    run()

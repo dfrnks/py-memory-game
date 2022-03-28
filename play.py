@@ -12,7 +12,7 @@ from pathlib import Path
 
 from src import PlayHistory
 from src import MemoryGameEnv
-from src import Memory
+from src import MemoryAgent
 
 
 def cls():
@@ -120,7 +120,7 @@ def play_with_network(ep=1):
 
     history = PlayHistory(save_dir)
 
-    memory = Memory(state_dim=(env.action_space.n, env.action_space.n), action_dim=env.action_space.n, save_dir=save_dir)
+    memory = MemoryAgent(state_dim=(env.action_space.n, env.action_space.n), action_dim=env.action_space.n, save_dir=save_dir)
 
     memory.load('checkpoints/memory_net.chkpt')
     memory.exploration_rate = 0

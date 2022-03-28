@@ -8,41 +8,58 @@ from collections import deque
 from . import MemoryNet
 
 
-class Memory:
-    def __init__(self, state_dim, action_dim, save_dir):
+class MemoryAgent:
+    def __init__(
+            self,
+            state_dim,
+            action_dim,
+            save_dir,
+            lr=0.00025,
+            max_memory_size=100000,
+            batch_size=32,
+            gamma=0.9,
+            exploration_rate=1,
+            exploration_rate_decay=0.99999975,
+            exploration_rate_min=0.1,
+            save_every=5e5,
+            burnin=1e4,
+            learn_every=3,
+            sync_every=1e4,
+    ):
+        # Define Layers
         self.state_dim = state_dim
         self.action_dim = action_dim
         self.save_dir = save_dir
 
         self.device = "cuda" if torch.cuda.is_available() else "cpu"
 
-        # Mario's DNN to predict the most optimal action - we implement this in the Learn section
-        self.net = MemoryNet(self.state_dim, self.action_dim).float()
+        # DNN Network
+        self.net = MemoryNet(self.state_dim, self.action_dim)
         self.net = self.net.float()
         self.net = self.net.to(device=self.device)
 
-        self.exploration_rate = 1
-        self.exploration_rate_decay = 0.99999975
-        self.exploration_rate_min = 0.1
-        self.curr_step = 0
-
-        self.save_every = 5e5  # no. of experiences between saving Mario Net
-
-        # Cache
-        self.memory = deque(maxlen=100000)
-        self.batch_size = 32
-
-        # TD Estimate & TD Target
-        self.gamma = 0.9
-
         # Updating the model
-        self.optimizer = torch.optim.Adam(self.net.parameters(), lr=0.00025)
+        self.optimizer = torch.optim.Adam(self.net.parameters(), lr=lr)
         self.loss_fn = torch.nn.SmoothL1Loss()
 
-        # Learning
-        self.burnin = 1e4  # min. experiences before training
-        self.learn_every = 3  # no. of experiences between updates to Q_online
-        self.sync_every = 1e4  # no. of experiences between Q_target & Q_online sync
+        # Cache - create memory
+        self.memory = deque(maxlen=max_memory_size)
+        self.batch_size = batch_size
+
+        # Learning parameters
+        self.gamma = gamma
+
+        self.exploration_rate = exploration_rate
+        self.exploration_rate_decay = exploration_rate_decay
+        self.exploration_rate_min = exploration_rate_min
+
+        self.burnin = burnin  # min. experiences before training
+        self.learn_every = learn_every  # no. of experiences between updates to Q_online
+        self.sync_every = sync_every  # no. of experiences between Q_target & Q_online sync
+
+        self.save_every = save_every  # no. of experiences between saving Mario Net
+
+        self.curr_step = 0
 
     def act(self, state):
         """
@@ -183,4 +200,3 @@ class Memory:
             self.exploration_rate = checkpoint['exploration_rate']
 
             self.net.load_state_dict(checkpoint['model'])
-
