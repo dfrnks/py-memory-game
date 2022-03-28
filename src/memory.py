@@ -3,8 +3,10 @@ import copy
 import torch
 import random
 import numpy as np
-from torch import nn
+
 from collections import deque
+
+from . import MemoryNet
 
 
 class Memory:
@@ -13,12 +15,11 @@ class Memory:
         self.action_dim = action_dim
         self.save_dir = save_dir
 
-        self.use_cuda = torch.cuda.is_available()
+        self.device = "cuda" if torch.cuda.is_available() else "cpu"
 
         # Mario's DNN to predict the most optimal action - we implement this in the Learn section
         self.net = MemoryNet(self.state_dim, self.action_dim).float()
-        if self.use_cuda:
-            self.net = self.net.to(device="cuda")
+        self.net = self.net.to(device=self.device)
 
         self.exploration_rate = 1
         self.exploration_rate_decay = 0.99999975
@@ -39,7 +40,6 @@ class Memory:
         self.loss_fn = torch.nn.SmoothL1Loss()
 
         # Learning
-
         self.burnin = 1e4  # min. experiences before training
         self.learn_every = 3  # no. of experiences between updates to Q_online
         self.sync_every = 1e4  # no. of experiences between Q_target & Q_online sync
@@ -59,10 +59,7 @@ class Memory:
 
         # EXPLOIT
         else:
-            if self.use_cuda:
-                state = torch.tensor(state).cuda()
-            else:
-                state = torch.tensor(state)
+            state = torch.tensor(state).to(device=self.device)
             state = state.unsqueeze(0)
             action_values = self.net(state.float(), model="online")
             action_idx = torch.argmax(action_values, axis=1).item()
@@ -73,6 +70,7 @@ class Memory:
 
         # increment step
         self.curr_step += 1
+
         return action_idx
 
     def cache(self, state, next_state, action, reward, done):
@@ -89,18 +87,11 @@ class Memory:
         # state = state.__array__()
         # next_state = next_state.__array__()
 
-        if self.use_cuda:
-            state = torch.tensor(state).cuda()
-            next_state = torch.tensor(next_state).cuda()
-            action = torch.tensor([action]).cuda()
-            reward = torch.tensor([reward]).cuda()
-            done = torch.tensor([done]).cuda()
-        else:
-            state = torch.tensor(state)
-            next_state = torch.tensor(next_state)
-            action = torch.tensor([action])
-            reward = torch.tensor([reward])
-            done = torch.tensor([done])
+        state = torch.tensor(state).to(device=self.device)
+        next_state = torch.tensor(next_state).to(device=self.device)
+        action = torch.tensor([action]).to(device=self.device)
+        reward = torch.tensor([reward]).to(device=self.device)
+        done = torch.tensor([done]).to(device=self.device)
 
         self.memory.append((state, next_state, action, reward, done,))
 
@@ -110,6 +101,7 @@ class Memory:
         """
         batch = random.sample(self.memory, self.batch_size)
         state, next_state, action, reward, done = map(torch.stack, zip(*batch))
+
         return state, next_state, action.squeeze(), reward.squeeze(), done.squeeze()
 
     def learn(self):
@@ -192,56 +184,3 @@ class Memory:
 
             self.net.load_state_dict(checkpoint['model'])
 
-
-class MemoryNet(nn.Module):
-    """
-    mini cnn structure
-    input -> (conv2d + relu) x 3 -> flatten -> (dense + relu) x 2 -> output
-    """
-
-    def __init__(self, input_dim, output_dim):
-        super().__init__()
-        c, h, w = input_dim
-
-        if h != 16:
-            raise ValueError(f"Expecting input height: 16, got: {h}")
-        if w != 16:
-            raise ValueError(f"Expecting input width: 16, got: {w}")
-
-        self.online = nn.Sequential(
-            # nn.Conv2d(in_channels=c, out_channels=32, kernel_size=8, stride=4),
-            # nn.ReLU(),
-            # nn.Conv2d(in_channels=32, out_channels=64, kernel_size=4, stride=2),
-            # nn.ReLU(),
-            # nn.Conv2d(in_channels=64, out_channels=64, kernel_size=3, stride=1),
-            # nn.ReLU(),
-            # nn.Flatten(),
-            # nn.Linear(3136, 512),
-            # nn.ReLU(),
-            # nn.Linear(512, output_dim),
-
-            nn.Linear(16, 128),
-            nn.Tanh(),
-            nn.Linear(128, 128),
-            nn.Tanh(),
-            nn.Linear(128, 16),
-            nn.ReLU(),
-            nn.Linear(16, output_dim),
-        )
-
-        use_cuda = torch.cuda.is_available()
-
-        if use_cuda:
-            self.online = self.online.to(device="cuda")
-
-        self.target = copy.deepcopy(self.online)
-
-        # Q_target parameters are frozen.
-        for p in self.target.parameters():
-            p.requires_grad = False
-
-    def forward(self, input, model):
-        if model == "online":
-            return self.online(input)
-        elif model == "target":
-            return self.target(input)
