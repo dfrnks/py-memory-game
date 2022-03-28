@@ -9,9 +9,7 @@ import datetime
 
 from pathlib import Path
 
-from src.memory_game import MemoryGame
-from src.memory_env import MemoryGameEnv
-from src.play_history import PlayHistory
+from src import PlayHistory, MemoryGameEnv
 
 logging.basicConfig(format='%(message)s')
 logging.getLogger().setLevel(logging.DEBUG)
