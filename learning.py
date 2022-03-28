@@ -8,22 +8,6 @@ from src import Memory
 from src import MetricLogger
 
 
-def playing_manually(env):
-    position = input("Enter the X Y position (ex: 12):")
-
-    table, rewards, done, info = env.step(int(position))
-
-    print(env.render(table))
-    if done:
-        print(env.render())
-
-        print(f"Gaming complete, Total points: {info['points']}")
-
-        return
-
-    playing_manually(env)
-
-
 if __name__ == '__main__':
     env = MemoryGameEnv((4, 4))
 

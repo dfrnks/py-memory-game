@@ -11,74 +11,19 @@ from pathlib import Path
 
 from src import PlayHistory, MemoryGameEnv
 
+from play import play_random
+from play import playing_manually_start
+from play import play_with_network
+
 logging.basicConfig(format='%(message)s')
 logging.getLogger().setLevel(logging.DEBUG)
 
 
-def play(w, h, history: PlayHistory, i, j):
-    env = MemoryGameEnv((w, h))
-    env.reset()
-
-    id = str(uuid.uuid4())
-    start_time = time.time()
-
-    done = False
-    games = []
-    n_games = 0
-    info = []
-
-    while not done:
-        n_games += 1
-
-        action = random.randint(0, env.action_space.n - 1)
-
-        game_board, reward, done, info = env.step(action)
-
-        games.append([
-            str(id),
-            str(w),
-            str(h),
-            str(action),
-            str(reward),
-            str(done),
-            str(n_games),
-            str(info['points']),
-            str(info['already_played']),
-            str(info['num_errors']),
-            str(time.time())
-        ])
-
-    print("--- {}-{} item. {} seconds. {} Pontos ---".format(j, i, (time.time() - start_time), info['points']))
-
-    for l in games:
-        history.record(games)
-
-
-def playEnv(w, h, n, t):
-    """
-    :param w: Largura
-    :param h: Altura
-    :param n: Numero de jogos
-    :param t: Numero de threads
-    :return:
-    """
-    save_dir = Path("history") / datetime.datetime.now().strftime("%Y-%m-%dT%H-%M-%S")
-    save_dir.mkdir(parents=True)
-    history = PlayHistory(save_dir)
-
-    for j in range(int(n/t)):
-        threads = [None] * t
-
-        for i in range(len(threads)):
-            threads[i] = threading.Thread(target=play, args=(w, h, history, i, j,))
-            threads[i].start()
-
-        for i in range(len(threads)):
-            threads[i].join(600)
-
-
 if __name__ == "__main__":
     try:
-        playEnv(4, 4, 10, 5)
+        # playing_manually_start()
+
+        play_random(4, 4, 1, 1)
+        play_with_network(1)
     except KeyboardInterrupt:
         sys.exit()
