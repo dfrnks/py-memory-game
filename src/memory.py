@@ -1,5 +1,4 @@
 import os
-import copy
 import torch
 import random
 import numpy as np
@@ -19,6 +18,7 @@ class Memory:
 
         # Mario's DNN to predict the most optimal action - we implement this in the Learn section
         self.net = MemoryNet(self.state_dim, self.action_dim).float()
+        self.net = self.net.float()
         self.net = self.net.to(device=self.device)
 
         self.exploration_rate = 1

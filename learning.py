@@ -1,18 +1,14 @@
-from src.memory_env import MemoryGameEnv
-from src.memory_play import Memory
-from src.logging import MetricLogger
-
 import torch
-from pathlib import Path
 import datetime
-import random, os, time
+
+from pathlib import Path
+
+from src import MemoryGameEnv
+from src import Memory
+from src import MetricLogger
 
 
-def cls():
-    os.system('cls' if os.name == 'nt' else 'clear')
-
-
-def playing(env):
+def playing_manually(env):
     position = input("Enter the X Y position (ex: 12):")
 
     table, rewards, done, info = env.step(int(position))
@@ -25,24 +21,18 @@ def playing(env):
 
         return
 
-    playing(env)
+    playing_manually(env)
 
 
 if __name__ == '__main__':
     env = MemoryGameEnv((4, 4))
 
-    use_cuda = torch.cuda.is_available()
-    print(f"Using CUDA: {use_cuda}")
-    print()
-
-    device = torch.device('cpu')
-    if use_cuda:
-        device = torch.device('cuda')
+    print(f"Using CUDA: {torch.cuda.is_available()}\n")
 
     save_dir = Path("checkpoints") / datetime.datetime.now().strftime("%Y-%m-%dT%H-%M-%S")
     save_dir.mkdir(parents=True)
 
-    memory = Memory(state_dim=(1, 16, 16), action_dim=env.action_space.n, save_dir=save_dir)
+    memory = Memory(state_dim=(env.action_space.n, env.action_space.n), action_dim=env.action_space.n, save_dir=save_dir)
 
     memory.load('checkpoints/memory_net.chkpt')
 

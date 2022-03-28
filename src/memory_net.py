@@ -11,7 +11,7 @@ class MemoryNet(nn.Module):
     def __init__(self, input_dim, output_dim):
         super().__init__()
 
-        c, h, w = input_dim
+        h, w = input_dim
 
         if h != 16:
             raise ValueError(f"Expecting input height: 16, got: {h}")
