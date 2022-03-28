@@ -123,6 +123,7 @@ def play_with_network(ep=1):
     memory = Memory(state_dim=(env.action_space.n, env.action_space.n), action_dim=env.action_space.n, save_dir=save_dir)
 
     memory.load('checkpoints/memory_net.chkpt')
+    memory.exploration_rate = 0
 
     for i in range(ep):
 
