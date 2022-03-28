@@ -72,7 +72,7 @@ class MemoryGameEnv(Env):
         assert self.action_space.contains(action)
 
         if action in self.already_played:
-            return self.game_board, 0, False, {
+            return self.game_board, -1, False, {
                 'points': self.points,
                 'already_played': len(self.already_played),
                 'num_errors': self.num_errors

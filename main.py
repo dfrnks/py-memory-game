@@ -5,82 +5,82 @@ import time
 import uuid
 import os
 import threading
+import datetime
+
+from pathlib import Path
 
 from src.memory_game import MemoryGame
+from src.memory_env import MemoryGameEnv
+from src.play_history import PlayHistory
 
 logging.basicConfig(format='%(message)s')
 logging.getLogger().setLevel(logging.DEBUG)
 
 
-def play(w, h, file_path, i, j):
+def play(w, h, history: PlayHistory, i, j):
+    env = MemoryGameEnv((w, h))
+    env.reset()
+
     id = str(uuid.uuid4())
     start_time = time.time()
 
-    game = MemoryGame(w, h)
-    game.start()
+    done = False
+    games = []
+    n_games = 0
+    info = []
 
-    winning = False
-    list = []
-    jogadas = 0
-    while not winning:
-        x = random.randint(0, w-1)
-        y = random.randint(0, h-1)
-        jogadas += 1
+    while not done:
+        n_games += 1
 
-        winning, table, pontos, acerto = game.next(x, y)
+        action = random.randint(0, env.action_space.n - 1)
 
-        list.append([
+        game_board, reward, done, info = env.step(action)
+
+        games.append([
             str(id),
             str(w),
             str(h),
-            str(x),
-            str(y),
-            str(winning),
-            str(acerto),
-            str(pontos),
-            str(jogadas),
-            str(int(len(game.positions))),
+            str(action),
+            str(reward),
+            str(done),
+            str(n_games),
+            str(info['points']),
+            str(info['already_played']),
+            str(info['num_errors']),
             str(time.time())
         ])
 
-        # if (time.time() - start_time) % 5:
-        #     with open(file_path, mode='a', encoding='utf-8') as myfile:
-        #         myfile.write('\n'.join(','.join(l) for l in list) + '\n')
-        #     list = []
-        # time.sleep(0.01)
+    print("--- {}-{} item. {} seconds. {} Pontos ---".format(j, i, (time.time() - start_time), info['points']))
 
-        # if jogadas % 100000 == 0:
-        #     print(f"Jogada {jogadas} - {len(game.positions)}")
-        # game.print(f"Jogada {jogadas} - {len(game.positions)}")
-        # print(f"Jogada {jogadas} - {len(game.positions)}")
+    for l in games:
+        history.record(games)
 
-    print("--- {}-{} item. {} seconds. {} Pontos ---".format(j, i, (time.time() - start_time), pontos))
 
-    with open(file_path, mode='a', encoding='utf-8') as myfile:
-        myfile.write('\n'.join(','.join(l) for l in list) + '\n')
+def playEnv(w, h, n, t):
+    """
+    :param w: Largura
+    :param h: Altura
+    :param n: Numero de jogos
+    :param t: Numero de threads
+    :return:
+    """
+    save_dir = Path("history") / datetime.datetime.now().strftime("%Y-%m-%dT%H-%M-%S")
+    save_dir.mkdir(parents=True)
+    history = PlayHistory(save_dir)
+
+    for j in range(int(n/t)):
+        threads = [None] * t
+
+        for i in range(len(threads)):
+            threads[i] = threading.Thread(target=play, args=(w, h, history, i, j,))
+            threads[i].start()
+
+        for i in range(len(threads)):
+            threads[i].join(600)
 
 
 if __name__ == "__main__":
     try:
-        size = 10
-        file_path = f'jogos-{size}x{size}-full.csv'
-
-        if not os.path.exists(file_path):
-            with open(file_path, mode='a', encoding='utf-8') as myfile:
-                myfile.write('id,width,height,x,y,winning,acerto,pontos,jogada,possicoes,time\n')
-
-        # play(size, size, file_path, 0, 0)
-
-        for j in range(500):
-            threads = [None] * 10
-            results = []
-
-            for i in range(len(threads)):
-                threads[i] = threading.Thread(target=play, args=(size, size, file_path, i, j,))
-                threads[i].start()
-
-            for i in range(len(threads)):
-                threads[i].join(600)
-
+        playEnv(4, 4, 10, 5)
     except KeyboardInterrupt:
         sys.exit()
