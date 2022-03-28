@@ -72,7 +72,7 @@ class MemoryGameEnv(Env):
         assert self.action_space.contains(action)
 
         if action in self.already_played:
-            return self.game_board, -1, False, {
+            return copy.deepcopy(self.game_board), -1, False, {
                 'points': self.points,
                 'already_played': len(self.already_played),
                 'num_errors': self.num_errors
@@ -84,7 +84,7 @@ class MemoryGameEnv(Env):
             self.game_board[action] = self.game_board_completed[action]
             self.already_played.append(action)
 
-            return self.game_board, 0, False, {
+            return copy.deepcopy(self.game_board), 0, False, {
                 'points': self.points,
                 'already_played': len(self.already_played) - 1,
                 'num_errors': self.num_errors
@@ -97,7 +97,7 @@ class MemoryGameEnv(Env):
             self.last_played = None
             self.num_errors = 0
 
-            return self.game_board, 1, len(self.already_played) == self.nS, {
+            return copy.deepcopy(self.game_board), 1, len(self.already_played) == self.nS, {
                 'points': self.points,
                 'already_played': len(self.already_played),
                 'num_errors': self.num_errors
@@ -147,7 +147,7 @@ class MemoryGameEnv(Env):
 
         self.game_board_completed, self.game_board = createGameBoard(self.shape[0], self.shape[1], 0)
 
-        return self.game_board
+        return copy.deepcopy(self.game_board)
 
     def render(self, game_board=None, mode='human'):
         outfile = StringIO()

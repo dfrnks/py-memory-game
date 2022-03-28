@@ -70,16 +70,17 @@ class MemoryAgent:
         Outputs:
         action_idx (int): An integer representing which action Mario will perform
         """
-        # EXPLORE
         if np.random.rand() < self.exploration_rate:
+            # EXPLORE
             action_idx = np.random.randint(self.action_dim)
-
-        # EXPLOIT
         else:
+            # EXPLOIT
             state = torch.tensor(state).to(device=self.device)
             state = state.unsqueeze(0)
-            action_values = self.net(state.float(), model="online")
-            action_idx = torch.argmax(action_values, axis=1).item()
+            state = state.float()
+
+            action_values = self.net(state, model="online")
+            action_idx = torch.argmax(action_values).item()
 
         # decrease exploration_rate
         self.exploration_rate *= self.exploration_rate_decay
@@ -101,9 +102,6 @@ class MemoryAgent:
         reward (float),
         done(bool))
         """
-        # state = state.__array__()
-        # next_state = next_state.__array__()
-
         state = torch.tensor(state).to(device=self.device)
         next_state = torch.tensor(next_state).to(device=self.device)
         action = torch.tensor([action]).to(device=self.device)
@@ -149,21 +147,25 @@ class MemoryAgent:
         return td_est.mean().item(), loss
 
     def td_estimate(self, state, action):
-        current_Q = self.net(state.float(), model="online")[
-            np.arange(0, self.batch_size), action
-        ]  # Q_online(s,a)
+        action_values = self.net(state.float(), model="online")
 
-        return current_Q
+        current_q = action_values[
+            np.arange(0, self.batch_size), action
+        ]
+
+        return current_q
 
     @torch.no_grad()
     def td_target(self, reward, next_state, done):
-        next_state_Q = self.net(next_state.float(), model="online")
-        best_action = torch.argmax(next_state_Q, axis=1)
-        next_Q = self.net(next_state.float(), model="target")[
+        next_state_q = self.net(next_state.float(), model="online")
+        best_action = torch.argmax(next_state_q, axis=1)
+
+        action_target = self.net(next_state.float(), model="target")
+        next_q = action_target[
             np.arange(0, self.batch_size), best_action
         ]
 
-        return (reward + (1 - done.float()) * self.gamma * next_Q).float()
+        return (reward + (1 - done.float()) * self.gamma * next_q).float()
 
     def update_Q_online(self, td_estimate, td_target):
         loss = self.loss_fn(td_estimate, td_target)

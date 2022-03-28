@@ -1,6 +1,4 @@
 import os
-import sys
-import logging
 import random
 import time
 import uuid
@@ -120,10 +118,14 @@ def play_with_network(ep=1):
 
     history = PlayHistory(save_dir)
 
-    memory = MemoryAgent(state_dim=(env.action_space.n, env.action_space.n), action_dim=env.action_space.n, save_dir=save_dir)
+    agent = MemoryAgent(
+        state_dim=(env.action_space.n, env.action_space.n),
+        action_dim=env.action_space.n,
+        save_dir=save_dir
+    )
 
-    memory.load('checkpoints/memory_net.chkpt')
-    memory.exploration_rate = 0
+    agent.load('checkpoints/memory_net.chkpt')
+    agent.exploration_rate = 0
 
     for i in range(ep):
 
@@ -138,7 +140,9 @@ def play_with_network(ep=1):
         info = []
 
         while not done:
-            action = memory.act(state)
+            n_games += 1
+
+            action = agent.act(state)
 
             next_state, reward, done, info = env.step(action)
 
