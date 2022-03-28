@@ -8,11 +8,11 @@ import datetime
 import random, os, time
 
 
-def __cls():
+def cls():
     os.system('cls' if os.name == 'nt' else 'clear')
 
 
-def playing(env, message=None):
+def playing(env):
     position = input("Enter the X Y position (ex: 12):")
 
     table, rewards, done, info = env.step(int(position))

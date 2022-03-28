@@ -10,6 +10,7 @@ class MetricLogger:
         self.curr_ep_loss = None
         self.curr_ep_length = None
         self.curr_ep_reward = None
+
         self.save_log = save_dir / "log"
 
         with open(self.save_log, "w") as f:
