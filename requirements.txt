@@ -4,3 +4,6 @@ gym~=0.23.1
 numpy~=1.22.3
 pygame~=2.1.2
 matplotlib
+tqdm
+torchvision
+tensorboard

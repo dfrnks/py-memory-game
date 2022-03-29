@@ -100,7 +100,7 @@ class MemoryAgent:
         next_state (LazyFrame),
         action (int),
         reward (float),
-        done(bool))
+        done(bool)
         """
         state = torch.tensor(state).to(device=self.device)
         next_state = torch.tensor(next_state).to(device=self.device)

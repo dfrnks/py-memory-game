@@ -3,6 +3,8 @@ import datetime
 
 from pathlib import Path
 
+from tqdm import tqdm
+
 from src import MemoryGameEnv
 from src import MemoryAgent
 from src import MetricLogger
@@ -29,12 +31,13 @@ def run(episodes=10000):
 
     logger = MetricLogger(save_dir)
 
-    for e in range(episodes):
+    progress_bar = tqdm(range(episodes))
+    for e in progress_bar:
+        progress_bar.set_description_str(f'Training {e}')
 
         state = env.reset()
 
         done = False
-
         # Play the game!
         while not done:
             # Run agent on the state
@@ -50,22 +53,25 @@ def run(episodes=10000):
             q, loss = agent.learn()
 
             # Logging
-            logger.log_step(reward, loss, q)
+            logger.log_step(e, reward, loss, q, info['points'])
 
             # Update state
             state = next_state
 
-        logger.log_episode()
+        logger.log_episode(e)
 
         if e % 20 == 0:
             logger.record(
+                progress_bar,
                 episode=e,
                 epsilon=agent.exploration_rate,
                 step=agent.curr_step
             )
 
+    logger.close()
+
     agent.save('checkpoints/memory_net.chkpt')
 
 
 if __name__ == '__main__':
-    run(1)
+    run(2)
