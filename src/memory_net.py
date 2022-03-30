@@ -20,7 +20,7 @@ class MemoryNet(nn.Module):
             raise ValueError(f"Expecting input width: 16, got: {w}")
 
         self.online = nn.Sequential(
-            nn.Conv1d(in_channels=2, out_channels=16, kernel_size=1, stride=1),
+            nn.Conv1d(in_channels=1, out_channels=16, kernel_size=1, stride=1),
             nn.ReLU(),
             nn.Conv1d(in_channels=16, out_channels=32, kernel_size=1, stride=1),
             nn.ReLU(),
@@ -31,7 +31,7 @@ class MemoryNet(nn.Module):
             nn.Conv1d(in_channels=128, out_channels=2, kernel_size=1, stride=1),
             nn.ReLU(),
             nn.Flatten(),
-            nn.Linear(16, 256),
+            nn.Linear(32, 256),
             nn.ReLU(),
             nn.Linear(256, 16),
             nn.ReLU(),

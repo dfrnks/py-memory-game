@@ -75,12 +75,11 @@ class MemoryAgent:
             action_idx = np.random.randint(self.action_dim)
         else:
             # EXPLOIT
-            state = torch.tensor(state).to(device=self.device)
+            state = torch.FloatTensor(state).to(device=self.device)
             state = state.unsqueeze(0)
-            state = state.float()
 
             action_values = self.net(state, model="online")
-            action_idx = torch.argmax(action_values).item()
+            action_idx = torch.argmax(action_values, axis=1).item()
 
         # decrease exploration_rate
         self.exploration_rate *= self.exploration_rate_decay
