@@ -7,7 +7,6 @@ from torch import nn
 class MemoryNet(nn.Module):
     """
     mini cnn structure
-    input -> (conv2d + relu) x 3 -> flatten -> (dense + relu) x 2 -> output
     """
 
     def __init__(self, input_dim, output_dim):
@@ -21,22 +20,20 @@ class MemoryNet(nn.Module):
             raise ValueError(f"Expecting input width: 16, got: {w}")
 
         self.online = nn.Sequential(
-            # nn.Conv2d(in_channels=c, out_channels=32, kernel_size=8, stride=4),
-            # nn.ReLU(),
-            # nn.Conv2d(in_channels=32, out_channels=64, kernel_size=4, stride=2),
-            # nn.ReLU(),
-            # nn.Conv2d(in_channels=64, out_channels=64, kernel_size=3, stride=1),
-            # nn.ReLU(),
-            # nn.Flatten(),
-            # nn.Linear(3136, 512),
-            # nn.ReLU(),
-            # nn.Linear(512, output_dim),
-
-            nn.Linear(16, 128),
-            nn.Tanh(),
-            nn.Linear(128, 128),
-            nn.Tanh(),
-            nn.Linear(128, 16),
+            nn.Conv1d(in_channels=2, out_channels=16, kernel_size=1, stride=1),
+            nn.ReLU(),
+            nn.Conv1d(in_channels=16, out_channels=32, kernel_size=1, stride=1),
+            nn.ReLU(),
+            nn.Conv1d(in_channels=32, out_channels=64, kernel_size=1, stride=1),
+            nn.ReLU(),
+            nn.Conv1d(in_channels=64, out_channels=128, kernel_size=1, stride=1),
+            nn.ReLU(),
+            nn.Conv1d(in_channels=128, out_channels=2, kernel_size=1, stride=1),
+            nn.ReLU(),
+            nn.Flatten(),
+            nn.Linear(16, 256),
+            nn.ReLU(),
+            nn.Linear(256, 16),
             nn.ReLU(),
             nn.Linear(16, output_dim),
         )
