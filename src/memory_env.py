@@ -61,7 +61,16 @@ class MemoryGameEnv(Env):
         self.already_played = []
         self.points = 0
         self.num_errors = 0
+        self.correct = 0
         self.last_played = None
+
+        self.rewards = {
+            'first': 2,
+            'correct': 5, # Acumulative
+            'wrong': -5,
+            'already_played_last': -10,
+            'already_played': -2
+        }
 
     def step(self, action) -> ([], int, bool, dict):
         """
@@ -72,7 +81,9 @@ class MemoryGameEnv(Env):
         assert self.action_space.contains(action)
 
         if action in self.already_played:
-            return [copy.deepcopy(self.game_board)], -1, False, {
+            rewards = self.rewards['already_played_last'] if action == self.last_played else self.rewards['already_played']
+
+            return [copy.deepcopy(self.game_board)], rewards, False, {
                 'points': self.points,
                 'already_played': len(self.already_played),
                 'num_errors': self.num_errors
@@ -84,7 +95,7 @@ class MemoryGameEnv(Env):
             self.game_board[action] = self.game_board_completed[action]
             self.already_played.append(action)
 
-            return [copy.deepcopy(self.game_board)], 0, False, {
+            return [copy.deepcopy(self.game_board)], self.rewards['first'], False, {
                 'points': self.points,
                 'already_played': len(self.already_played) - 1,
                 'num_errors': self.num_errors
@@ -96,12 +107,17 @@ class MemoryGameEnv(Env):
             self.already_played.append(action)
             self.last_played = None
             self.num_errors = 0
+            self.correct += 1
 
-            return [copy.deepcopy(self.game_board)], 1, len(self.already_played) == self.nS, {
+            rewards = self.correct * self.rewards['correct']
+
+            return [copy.deepcopy(self.game_board)], rewards, len(self.already_played) == self.nS, {
                 'points': self.points,
                 'already_played': len(self.already_played),
                 'num_errors': self.num_errors
             }
+
+        self.correct = 0
 
         self.num_errors += 1
 
@@ -122,7 +138,7 @@ class MemoryGameEnv(Env):
 
         self.last_played = None
 
-        return [result_table], -1, False, {
+        return [result_table], self.rewards['wrong'], False, {
             'points': self.points,
             'already_played': len(self.already_played),
             'num_errors': self.num_errors

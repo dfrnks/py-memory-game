@@ -163,7 +163,8 @@ class MemoryAgent:
         next_q = action_target[
             np.arange(0, self.batch_size), best_action
         ]
-
+        # A Equação de Bellman
+        # https://www.deeplearningbook.com.br/deep-q-network-e-processos-de-decisao-de-markov/
         return (reward + (1 - done.float()) * self.gamma * next_q).float()
 
     def update_Q_online(self, td_estimate, td_target):

@@ -19,6 +19,10 @@ class MemoryNet(nn.Module):
         if w != 16:
             raise ValueError(f"Expecting input width: 16, got: {w}")
 
+        # https://pytorch.org/docs/stable/nn.html#recurrent-layers
+        # RNN - https://pytorch.org/docs/stable/generated/torch.nn.RNN.html
+        # LSTM - https://pytorch.org/docs/stable/generated/torch.nn.LSTM.html
+
         self.online = nn.Sequential(
             nn.Conv1d(in_channels=1, out_channels=16, kernel_size=1, stride=1),
             nn.ReLU(),

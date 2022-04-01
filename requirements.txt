@@ -7,3 +7,4 @@ matplotlib
 tqdm
 torchvision
 tensorboard
+torchsummary

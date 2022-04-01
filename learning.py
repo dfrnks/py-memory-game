@@ -22,9 +22,7 @@ def run(episodes=10000):
         state_dim=(env.action_space.n, env.action_space.n),
         action_dim=env.action_space.n,
         save_dir=save_dir,
-        burnin=2,
-        learn_every=2,
-        batch_size=2
+        batch_size=32
     )
 
     agent.load('checkpoints/memory_net.chkpt')
@@ -74,4 +72,4 @@ def run(episodes=10000):
 
 
 if __name__ == '__main__':
-    run(2)
+    run(5000)
