@@ -23,23 +23,33 @@ class MemoryNet(nn.Module):
         # RNN - https://pytorch.org/docs/stable/generated/torch.nn.RNN.html
         # LSTM - https://pytorch.org/docs/stable/generated/torch.nn.LSTM.html
 
+        # self.online = nn.Sequential(
+        #     nn.Conv1d(in_channels=1, out_channels=16, kernel_size=1, stride=1),
+        #     nn.ReLU(),
+        #     nn.Conv1d(in_channels=16, out_channels=32, kernel_size=1, stride=1),
+        #     nn.ReLU(),
+        #     nn.Conv1d(in_channels=32, out_channels=64, kernel_size=1, stride=1),
+        #     nn.ReLU(),
+        #     nn.Conv1d(in_channels=64, out_channels=128, kernel_size=1, stride=1),
+        #     nn.ReLU(),
+        #     nn.Conv1d(in_channels=128, out_channels=2, kernel_size=1, stride=1),
+        #     nn.ReLU(),
+        #     nn.Flatten(),
+        #     nn.Linear(32, 256),
+        #     nn.ReLU(),
+        #     nn.Linear(256, 16),
+        #     nn.ReLU(),
+        #     nn.Linear(16, output_dim),
+        # )
+
         self.online = nn.Sequential(
-            nn.Conv1d(in_channels=1, out_channels=16, kernel_size=1, stride=1),
+            nn.Linear(16, 128),
             nn.ReLU(),
-            nn.Conv1d(in_channels=16, out_channels=32, kernel_size=1, stride=1),
+            nn.Linear(128, 64),
             nn.ReLU(),
-            nn.Conv1d(in_channels=32, out_channels=64, kernel_size=1, stride=1),
+            nn.Linear(64, 32),
             nn.ReLU(),
-            nn.Conv1d(in_channels=64, out_channels=128, kernel_size=1, stride=1),
-            nn.ReLU(),
-            nn.Conv1d(in_channels=128, out_channels=2, kernel_size=1, stride=1),
-            nn.ReLU(),
-            nn.Flatten(),
-            nn.Linear(32, 256),
-            nn.ReLU(),
-            nn.Linear(256, 16),
-            nn.ReLU(),
-            nn.Linear(16, output_dim),
+            nn.Linear(32, 16)
         )
 
         device = "cuda" if torch.cuda.is_available() else "cpu"

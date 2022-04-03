@@ -83,7 +83,7 @@ class MemoryGameEnv(Env):
         if action in self.already_played:
             rewards = self.rewards['already_played_last'] if action == self.last_played else self.rewards['already_played']
 
-            return [copy.deepcopy(self.game_board)], rewards, False, {
+            return copy.deepcopy(self.game_board), rewards, False, {
                 'points': self.points,
                 'already_played': len(self.already_played),
                 'num_errors': self.num_errors
@@ -95,7 +95,7 @@ class MemoryGameEnv(Env):
             self.game_board[action] = self.game_board_completed[action]
             self.already_played.append(action)
 
-            return [copy.deepcopy(self.game_board)], self.rewards['first'], False, {
+            return copy.deepcopy(self.game_board), self.rewards['first'], False, {
                 'points': self.points,
                 'already_played': len(self.already_played) - 1,
                 'num_errors': self.num_errors
@@ -111,7 +111,7 @@ class MemoryGameEnv(Env):
 
             rewards = self.correct * self.rewards['correct']
 
-            return [copy.deepcopy(self.game_board)], rewards, len(self.already_played) == self.nS, {
+            return copy.deepcopy(self.game_board), rewards, len(self.already_played) == self.nS, {
                 'points': self.points,
                 'already_played': len(self.already_played),
                 'num_errors': self.num_errors
@@ -138,7 +138,7 @@ class MemoryGameEnv(Env):
 
         self.last_played = None
 
-        return [result_table], self.rewards['wrong'], False, {
+        return result_table, self.rewards['wrong'], False, {
             'points': self.points,
             'already_played': len(self.already_played),
             'num_errors': self.num_errors
@@ -163,7 +163,7 @@ class MemoryGameEnv(Env):
 
         self.game_board_completed, self.game_board = createGameBoard(self.shape[0], self.shape[1], 0)
 
-        return [copy.deepcopy(self.game_board)]
+        return copy.deepcopy(self.game_board)
 
     def render(self, game_board=None, mode='human'):
         outfile = StringIO()

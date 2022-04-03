@@ -22,6 +22,7 @@ def run(episodes=10000):
         state_dim=(env.action_space.n, env.action_space.n),
         action_dim=env.action_space.n,
         save_dir=save_dir,
+        exploration_rate_decay=0.99999999,
         batch_size=32
     )
 
@@ -72,4 +73,4 @@ def run(episodes=10000):
 
 
 if __name__ == '__main__':
-    run(5000)
+    run(100000)
