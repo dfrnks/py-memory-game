@@ -44,7 +44,7 @@ def playing_manually_start():
     playing_manually(env)
 
 
-def play_random_env(w, h, history: PlayHistory, i, j):
+def play_random_env(w, h, history: PlayHistory, i, j, show=False):
     env = MemoryGameEnv((w, h))
     env.reset()
 
@@ -63,6 +63,9 @@ def play_random_env(w, h, history: PlayHistory, i, j):
 
         game_board, reward, done, info = env.step(action)
 
+        if show:
+            print(env.render())
+
         games.append([
             str(id),
             str(w),
@@ -77,12 +80,12 @@ def play_random_env(w, h, history: PlayHistory, i, j):
             str(time.time())
         ])
 
-    print("--- {}-{} item. {} seconds. {} Pontos ---".format(j, i, (time.time() - start_time), info['points']))
+    print("--- {}-{} item. {} seconds. {} jogadas, {} Pontos ---".format(j, i, (time.time() - start_time), n_games, info['points']))
 
     history.record(games)
 
 
-def play_random(w, h, n, t):
+def play_random(w, h, n, t, show=False):
     """
     :param w: Largura
     :param h: Altura
@@ -96,19 +99,19 @@ def play_random(w, h, n, t):
 
     for j in range(int(n/t)):
         if t == 1:
-            play_random_env(w, h, history, 1, j)
+            play_random_env(w, h, history, 1, j, show)
         else:
             threads = [None] * t
 
             for i in range(len(threads)):
-                threads[i] = threading.Thread(target=play_random_env, args=(w, h, history, i, j,))
+                threads[i] = threading.Thread(target=play_random_env, args=(w, h, history, i, j, show,))
                 threads[i].start()
 
             for i in range(len(threads)):
                 threads[i].join(600)
 
 
-def play_with_network(ep=1):
+def play_with_network(ep=1, show=False):
     w = 4
     h = 4
     env = MemoryGameEnv((w, h))
@@ -148,6 +151,9 @@ def play_with_network(ep=1):
 
             state = next_state
 
+            if show:
+                print(env.render())
+
             games.append([
                 str(id),
                 str(w),
@@ -162,6 +168,6 @@ def play_with_network(ep=1):
                 str(time.time())
             ])
 
-        print("--- {}-{} item. {} seconds. {} Pontos ---".format(0, i, (time.time() - start_time), info['points']))
+        print("--- {}-{} item. {} seconds. {} jogadas, {} Pontos ---".format(0, i, (time.time() - start_time), n_games, info['points']))
 
         history.record(games)

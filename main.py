@@ -34,10 +34,10 @@ if __name__ == "__main__":
             playing_manually_start()
 
         if args[1] in ('-r', '--random'):
-            play_random(4, 4, 1, 1)
+            play_random(4, 4, 1, 1, True)
 
         if args[1] in ('-n', '--network'):
-            play_with_network(1)
+            play_with_network(1, True)
 
     except KeyboardInterrupt:
         sys.exit()
