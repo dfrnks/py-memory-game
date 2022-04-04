@@ -46,12 +46,12 @@ tensorboard --logdir=runs
 
 ## Hiperpameters
 
-    lr=0.00025,
-    max_memory_size=100000,
-    batch_size=32,
+    lr=0.001,
+    max_memory_size=1000000,
+    batch_size=64,
     gamma=0.9,
     exploration_rate=1,
-    exploration_rate_decay=0.99999975,
+    exploration_rate_decay=0.99999999,
     exploration_rate_min=0.1,
     save_every=5e5,
     burnin=1e4,
