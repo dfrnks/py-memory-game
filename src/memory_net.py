@@ -49,7 +49,7 @@ class MemoryNet(nn.Module):
             nn.ReLU(),
             nn.Linear(64, 32),
             nn.ReLU(),
-            nn.Linear(32, 16)
+            nn.Linear(32, output_dim)
         )
 
         device = "cuda" if torch.cuda.is_available() else "cpu"
