@@ -13,7 +13,7 @@ from src import MetricLogger
 def run(agent, episodes=10000):
     agent.load('checkpoints/memory_net.chkpt')
 
-    logger = MetricLogger(save_dir)
+    logger = MetricLogger(agent.save_dir)
 
     progress_bar = tqdm(range(episodes))
     for e in progress_bar:
