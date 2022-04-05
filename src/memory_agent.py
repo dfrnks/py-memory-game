@@ -14,6 +14,7 @@ class MemoryAgent:
             state_dim,
             action_dim,
             save_dir,
+            device,
             lr=0.00025,
             max_memory_size=100000,
             batch_size=32,
@@ -31,7 +32,7 @@ class MemoryAgent:
         self.action_dim = action_dim
         self.save_dir = save_dir
 
-        self.device = "cuda" if torch.cuda.is_available() else "cpu"
+        self.device = device
 
         # DNN Network
         self.net = MemoryNet(self.state_dim, self.action_dim)

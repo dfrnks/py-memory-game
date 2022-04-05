@@ -10,31 +10,7 @@ from src import MemoryAgent
 from src import MetricLogger
 
 
-def run(episodes=10000):
-    env = MemoryGameEnv((4, 4))
-
-    print(f"Using CUDA: {torch.cuda.is_available()}\n")
-
-    save_dir = Path("checkpoints") / datetime.datetime.now().strftime("%Y-%m-%dT%H-%M-%S")
-    save_dir.mkdir(parents=True)
-
-    agent = MemoryAgent(
-        state_dim=(env.action_space.n, env.action_space.n),
-        action_dim=env.action_space.n,
-        save_dir=save_dir,
-        lr=0.001,
-        max_memory_size=1000000,
-        batch_size=64,
-        gamma=0.9,
-        exploration_rate=1,
-        exploration_rate_decay=0.99999999,
-        exploration_rate_min=0.1,
-        save_every=5e5,
-        burnin=1e4,
-        learn_every=3,
-        sync_every=1e4,
-    )
-
+def run(agent, episodes=10000):
     agent.load('checkpoints/memory_net.chkpt')
 
     logger = MetricLogger(save_dir)
@@ -82,4 +58,28 @@ def run(episodes=10000):
 
 
 if __name__ == '__main__':
-    run(100000)
+
+    env = MemoryGameEnv((4, 4))
+
+    save_dir = Path("checkpoints") / datetime.datetime.now().strftime("%Y-%m-%dT%H-%M-%S")
+    save_dir.mkdir(parents=True)
+
+    agent = MemoryAgent(
+        state_dim=(env.action_space.n, env.action_space.n),
+        action_dim=env.action_space.n,
+        save_dir=save_dir,
+        lr=0.001,
+        max_memory_size=1000000,
+        batch_size=64,
+        gamma=0.9,
+        exploration_rate=1,
+        exploration_rate_decay=0.99999999,
+        exploration_rate_min=0.1,
+        save_every=5e5,
+        burnin=1e4,
+        learn_every=3,
+        sync_every=1e4,
+        device="cuda" if torch.cuda.is_available() else "cpu"
+    )
+
+    run(agent, 100000)
