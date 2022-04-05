@@ -7,11 +7,12 @@ from tqdm import tqdm
 
 from src import MemoryGameEnv
 from src import MemoryAgent
+from src import MemoryNet
 from src import MetricLogger
 
 
 def run(agent, env, episodes=10000):
-    agent.load('checkpoints/memory_net.chkpt')
+    # agent.load('checkpoints/memory_net.chkpt')
 
     logger = MetricLogger(agent.save_dir)
 
@@ -64,9 +65,14 @@ if __name__ == '__main__':
     save_dir = Path("checkpoints") / datetime.datetime.now().strftime("%Y-%m-%dT%H-%M-%S")
     save_dir.mkdir(parents=True)
 
+    device = "cuda" if torch.cuda.is_available() else "cpu"
+
+    net = MemoryNet((env.action_space.n, env.action_space.n), env.action_space.n, device)
+
     agent = MemoryAgent(
         state_dim=(env.action_space.n, env.action_space.n),
         action_dim=env.action_space.n,
+        net=net,
         save_dir=save_dir,
         lr=0.001,
         max_memory_size=1000000,
@@ -79,7 +85,6 @@ if __name__ == '__main__':
         burnin=1e4,
         learn_every=3,
         sync_every=1e4,
-        device="cuda" if torch.cuda.is_available() else "cpu"
     )
 
     run(agent, env, 100000)

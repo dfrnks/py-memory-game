@@ -12,6 +12,8 @@ class MemoryNet(nn.Module):
     def __init__(self, input_dim, output_dim, device):
         super().__init__()
 
+        self.device = device
+
         h, w = input_dim
 
         if h != 16:
@@ -52,7 +54,7 @@ class MemoryNet(nn.Module):
             nn.Linear(16, output_dim)
         )
 
-        self.online = self.online.to(device=device)
+        self.online = self.online.to(device=self.device)
 
         self.target = copy.deepcopy(self.online)
 

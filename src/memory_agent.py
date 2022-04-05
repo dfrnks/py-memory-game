@@ -14,7 +14,7 @@ class MemoryAgent:
             state_dim,
             action_dim,
             save_dir,
-            device,
+            net,
             lr=0.00025,
             max_memory_size=100000,
             batch_size=32,
@@ -32,12 +32,10 @@ class MemoryAgent:
         self.action_dim = action_dim
         self.save_dir = save_dir
 
-        self.device = device
-
         # DNN Network
-        self.net = MemoryNet(self.state_dim, self.action_dim, self.device)
+        self.net = net #MemoryNet(self.state_dim, self.action_dim, self.device)
         self.net = self.net.float()
-        self.net = self.net.to(device=self.device)
+        # self.net = self.net.to(device=self.device)
 
         # Updating the model
         self.optimizer = torch.optim.Adam(self.net.parameters(), lr=lr)
@@ -102,11 +100,11 @@ class MemoryAgent:
         reward (float),
         done(bool)
         """
-        state = torch.tensor(state).to(device=self.device)
-        next_state = torch.tensor(next_state).to(device=self.device)
-        action = torch.tensor([action]).to(device=self.device)
-        reward = torch.tensor([reward]).to(device=self.device)
-        done = torch.tensor([done]).to(device=self.device)
+        state = torch.tensor(state).to(device=self.net.device)
+        next_state = torch.tensor(next_state).to(device=self.net.device)
+        action = torch.tensor([action]).to(device=self.net.device)
+        reward = torch.tensor([reward]).to(device=self.net.device)
+        done = torch.tensor([done]).to(device=self.net.device)
 
         self.memory.append((state, next_state, action, reward, done,))
 
