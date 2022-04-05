@@ -74,7 +74,7 @@ class MemoryAgent:
             action_idx = np.random.randint(self.action_dim)
         else:
             # EXPLOIT
-            state = torch.FloatTensor(state).to(device=self.device)
+            state = torch.FloatTensor(state).to(device=self.net.device)
             state = state.unsqueeze(0)
 
             action_values = self.net(state, model="online")
