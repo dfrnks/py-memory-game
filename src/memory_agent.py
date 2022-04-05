@@ -35,7 +35,7 @@ class MemoryAgent:
         self.device = device
 
         # DNN Network
-        self.net = MemoryNet(self.state_dim, self.action_dim)
+        self.net = MemoryNet(self.state_dim, self.action_dim, self.device)
         self.net = self.net.float()
         self.net = self.net.to(device=self.device)
 
