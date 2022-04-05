@@ -10,10 +10,10 @@ from src import MemoryAgent
 from src import MetricLogger
 
 
-def run(agent, episodes=10000):
+def run(agent, save_dir, episodes=10000):
     agent.load('checkpoints/memory_net.chkpt')
 
-    logger = MetricLogger(agent.save_dir)
+    logger = MetricLogger(save_dir)
 
     progress_bar = tqdm(range(episodes))
     for e in progress_bar:
@@ -82,4 +82,4 @@ if __name__ == '__main__':
         device="cuda" if torch.cuda.is_available() else "cpu"
     )
 
-    run(agent, 100000)
+    run(agent, save_dir, 100000)
