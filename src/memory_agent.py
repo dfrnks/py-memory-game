@@ -191,7 +191,7 @@ class MemoryAgent:
             save_path,
         )
 
-        print(f"MemoryNet saved to {save_path} at step {self.curr_step}")
+        #print(f"MemoryNet saved to {save_path} at step {self.curr_step}")
 
     def load(self, path):
         if os.path.exists(path):
