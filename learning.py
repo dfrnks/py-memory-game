@@ -76,6 +76,9 @@ def eval(agent, env, episodes=10000):
             # Agent performs action
             next_state, reward, done, info = env.step(action)
 
+            # Logging
+            logger.log_step(e, reward, 0, 0, info['points'])
+
             # Update state
             state = next_state
 

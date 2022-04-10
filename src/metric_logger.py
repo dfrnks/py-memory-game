@@ -7,7 +7,7 @@ from torch.utils.tensorboard import SummaryWriter
 
 class MetricLogger:
     def __init__(self, save_dir):
-        self.writer = SummaryWriter()
+        self.writer = SummaryWriter(log_dir=save_dir)
 
         self.curr_ep_reward = 0.0  # Soma todos os reward para cada jogada
         self.curr_ep_length = 0  # Quantidade de jogadas
@@ -15,7 +15,7 @@ class MetricLogger:
         self.curr_ep_q = 0.0  # Soma todos os qs
         self.curr_ep_loss_length = 0  # Quantidade de loss
 
-        self.save_log = save_dir / "log"
+        self.save_log = save_dir / datetime.datetime.now().strftime("%Y-%m-%dT%H-%M-%S") / "log"
 
         with open(self.save_log, "w") as f:
             f.write(
