@@ -1,4 +1,5 @@
 import torch
+import random
 import datetime
 
 from pathlib import Path
@@ -66,7 +67,7 @@ def eval(agent, env, episodes=10000, comment=''):
 
     progress_bar = tqdm(range(episodes))
     for e in progress_bar:
-        progress_bar.set_description_str(f'Training {e}')
+        progress_bar.set_description_str(f'Eval {e}')
 
         state = env.reset()
 
@@ -84,6 +85,40 @@ def eval(agent, env, episodes=10000, comment=''):
 
             # Update state
             state = next_state
+
+        logger.log_episode(e)
+
+        if e % 20 == 0:
+            logger.record(
+                progress_bar,
+                episode=e,
+                epsilon=agent.exploration_rate,
+                step=agent.curr_step
+            )
+
+    logger.close()
+
+
+def random(agent, env, episodes=10000, comment=''):
+    logger = MetricLogger(agent.save_dir, tag='random', comment=comment)
+
+    progress_bar = tqdm(range(episodes))
+    for e in progress_bar:
+        progress_bar.set_description_str(f'Random playing {e}')
+
+        env.reset()
+
+        done = False
+        # Play the game!
+        while not done:
+            # Run agent on the state
+            action = random.randint(0, env.action_space.n - 1)
+
+            # Agent performs action
+            next_state, reward, done, info = env.step(action)
+
+            # Logging
+            logger.log_step(e, reward, 0, 0, info['points'])
 
         logger.log_episode(e)
 
