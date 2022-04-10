@@ -31,7 +31,7 @@ class MemoryAgent:
         # Define Layers
         self.state_dim = state_dim
         self.action_dim = action_dim
-        self.save_dir = save_dir / datetime.datetime.now().strftime("%Y-%m-%dT%H-%M-%S")
+        self.save_dir = save_dir
 
         # DNN Network
         self.net = net #MemoryNet(self.state_dim, self.action_dim, self.device)
