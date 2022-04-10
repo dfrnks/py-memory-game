@@ -128,10 +128,10 @@ def play_random(w, h, n, t, save_dir, show=False):
                 threads[i].join(600)
 
 
-def play_with_network(agent, ep=1, show=False):
-    w = 4
-    h = 4
-    env = MemoryGameEnv((w, h))
+def play_with_network(agent, env, ep=1, show=False):
+    # w = 4
+    # h = 4
+    # env = MemoryGameEnv((w, h))
     #
     # save_dir = Path("history_net") / datetime.datetime.now().strftime("%Y-%m-%dT%H-%M-%S")
     # save_dir.mkdir(parents=True)
