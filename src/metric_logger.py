@@ -18,7 +18,9 @@ class MetricLogger:
         self.save_log = save_dir / datetime.datetime.now().strftime("%Y-%m-%dT%H-%M-%S")
         self.save_log.mkdir(parents=True)
 
-        with open(self.save_log / "log", "w") as f:
+        self.save_log = self.save_log / "log"
+
+        with open(self.save_log, "w") as f:
             f.write(
                 f"{'Episode':>8}{'Step':>8}{'Epsilon':>10}{'MeanReward':>15}"
                 f"{'MeanLength':>15}{'MeanLoss':>15}{'MeanQValue':>15}"
