@@ -8,13 +8,13 @@ from torch.utils.tensorboard import SummaryWriter
 
 
 class MetricLogger:
-    def __init__(self, save_dir, comment=''):
+    def __init__(self, save_dir, tag='', comment=''):
         current_time = datetime.datetime.now().strftime('%b%d_%H-%M-%S')
 
         self.writer = SummaryWriter(
             log_dir=save_dir / Path('tensorboard/' + current_time + '_' + socket.gethostname() + '_' + comment)
         )
-
+        self.tag = tag
         self.curr_ep_reward = 0.0  # Soma todos os reward para cada jogada
         self.curr_ep_length = 0  # Quantidade de jogadas
         self.curr_ep_loss = 0.0  # Soma todos os loss
@@ -65,10 +65,10 @@ class MetricLogger:
             self.curr_ep_loss += loss
             self.curr_ep_q += q
             self.curr_ep_loss_length += 1
-            self.writer.add_scalar("Loss", loss, e)
+            self.writer.add_scalar(f"Loss/{self.tag}", loss, e)
 
-        self.writer.add_scalar('Points', points, e)
-        self.writer.add_scalar('Rewards', self.curr_ep_reward, e)
+        self.writer.add_scalar(f'Points/{self.tag}', points, e)
+        self.writer.add_scalar(f'Rewards/{self.tag}', self.curr_ep_reward, e)
 
     def log_episode(self, e):
         """Mark end of episode"""
@@ -83,7 +83,7 @@ class MetricLogger:
         self.ep_avg_losses.append(ep_avg_loss)
         self.ep_avg_qs.append(ep_avg_q)
 
-        self.writer.add_scalar('NGames', self.curr_ep_length, e)
+        self.writer.add_scalar(f'NGames/{self.tag}', self.curr_ep_length, e)
 
         self.init_episode()
 

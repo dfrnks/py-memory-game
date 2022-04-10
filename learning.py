@@ -14,7 +14,7 @@ from src import MetricLogger
 def training(agent, env, episodes=10000, comment=''):
     agent.load(agent.save_dir / 'memory_net.chkpt')
 
-    logger = MetricLogger(agent.save_dir, comment=comment)
+    logger = MetricLogger(agent.save_dir, tag='train', comment=comment)
 
     progress_bar = tqdm(range(episodes))
     for e in progress_bar:
@@ -61,7 +61,7 @@ def training(agent, env, episodes=10000, comment=''):
 def eval(agent, env, episodes=10000, comment=''):
     agent.load(agent.save_dir / 'memory_net.chkpt')
 
-    logger = MetricLogger(agent.save_dir, comment=comment)
+    logger = MetricLogger(agent.save_dir, tag='eval', comment=comment)
 
     progress_bar = tqdm(range(episodes))
     for e in progress_bar:
