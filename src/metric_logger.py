@@ -10,7 +10,7 @@ class MetricLogger:
     def __init__(self, save_dir):
         current_time = datetime.datetime.now().strftime('%b%d_%H-%M-%S')
 
-        self.writer = SummaryWriter(log_dir=save_dir / 'tensorboard' / current_time + '_' + socket.gethostname())
+        self.writer = SummaryWriter(log_dir=save_dir / 'tensorboard/' + current_time + '_' + socket.gethostname())
 
         self.curr_ep_reward = 0.0  # Soma todos os reward para cada jogada
         self.curr_ep_length = 0  # Quantidade de jogadas
