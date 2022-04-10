@@ -8,10 +8,12 @@ from torch.utils.tensorboard import SummaryWriter
 
 
 class MetricLogger:
-    def __init__(self, save_dir):
+    def __init__(self, save_dir, comment=''):
         current_time = datetime.datetime.now().strftime('%b%d_%H-%M-%S')
 
-        self.writer = SummaryWriter(log_dir=save_dir / Path('tensorboard/' + current_time + '_' + socket.gethostname()))
+        self.writer = SummaryWriter(
+            log_dir=save_dir / Path('tensorboard/' + current_time + '_' + socket.gethostname() + '_' + comment)
+        )
 
         self.curr_ep_reward = 0.0  # Soma todos os reward para cada jogada
         self.curr_ep_length = 0  # Quantidade de jogadas

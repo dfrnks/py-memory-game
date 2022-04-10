@@ -11,10 +11,10 @@ from src import MemoryNet
 from src import MetricLogger
 
 
-def training(agent, env, episodes=10000):
+def training(agent, env, episodes=10000, comment=''):
     # agent.load('checkpoints/memory_net.chkpt')
 
-    logger = MetricLogger(agent.save_dir)
+    logger = MetricLogger(agent.save_dir, comment=comment)
 
     progress_bar = tqdm(range(episodes))
     for e in progress_bar:
@@ -58,8 +58,8 @@ def training(agent, env, episodes=10000):
     agent.save('checkpoints/memory_net.chkpt')
 
 
-def eval(agent, env, episodes=10000):
-    logger = MetricLogger(agent.save_dir)
+def eval(agent, env, episodes=10000, comment=''):
+    logger = MetricLogger(agent.save_dir, comment=comment)
 
     progress_bar = tqdm(range(episodes))
     for e in progress_bar:
