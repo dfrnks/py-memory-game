@@ -99,7 +99,7 @@ def eval(agent, env, episodes=10000, comment=''):
     logger.close()
 
 
-def random(agent, env, episodes=10000, comment=''):
+def rand(agent, env, episodes=10000, comment=''):
     logger = MetricLogger(agent.save_dir, tag='random', comment=comment)
 
     progress_bar = tqdm(range(episodes))
