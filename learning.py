@@ -60,6 +60,7 @@ def training(agent, env, episodes=10000, comment=''):
 
 def eval(agent, env, episodes=10000, comment=''):
     agent.load(agent.save_dir / 'memory_net.chkpt')
+    agent.exploration_rate = 0
 
     logger = MetricLogger(agent.save_dir, tag='eval', comment=comment)
 
