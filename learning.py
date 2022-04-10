@@ -11,7 +11,7 @@ from src import MemoryNet
 from src import MetricLogger
 
 
-def run(agent, env, episodes=10000):
+def training(agent, env, episodes=10000):
     # agent.load('checkpoints/memory_net.chkpt')
 
     logger = MetricLogger(agent.save_dir)
@@ -58,6 +58,40 @@ def run(agent, env, episodes=10000):
     agent.save('checkpoints/memory_net.chkpt')
 
 
+def eval(agent, env, episodes=10000):
+    logger = MetricLogger(agent.save_dir)
+
+    progress_bar = tqdm(range(episodes))
+    for e in progress_bar:
+        progress_bar.set_description_str(f'Training {e}')
+
+        state = env.reset()
+
+        done = False
+        # Play the game!
+        while not done:
+            # Run agent on the state
+            action = agent.act(state)
+
+            # Agent performs action
+            next_state, reward, done, info = env.step(action)
+
+            # Update state
+            state = next_state
+
+        logger.log_episode(e)
+
+        if e % 20 == 0:
+            logger.record(
+                progress_bar,
+                episode=e,
+                epsilon=agent.exploration_rate,
+                step=agent.curr_step
+            )
+
+    logger.close()
+
+
 if __name__ == '__main__':
 
     env = MemoryGameEnv((4, 4))
@@ -87,4 +121,4 @@ if __name__ == '__main__':
         sync_every=1e4,
     )
 
-    run(agent, env, 100000)
+    training(agent, env, 100000)
