@@ -112,7 +112,11 @@ def play_random(w, h, n, t, save_dir, show=False):
     # save_dir = Path("history") / datetime.datetime.now().strftime("%Y-%m-%dT%H-%M-%S")
     # save_dir.mkdir(parents=True)
 
-    history = PlayHistory(save_dir / 'history_net')
+    save_dir = save_dir / 'history_random'
+    save_dir = save_dir / datetime.datetime.now().strftime("%Y-%m-%dT%H-%M-%S")
+    save_dir.mkdir(parents=True)
+
+    history = PlayHistory(save_dir)
 
     for j in range(int(n / t)):
         if t == 1:
@@ -136,7 +140,11 @@ def play_with_network(agent, env, ep=1, show=False):
     # save_dir = Path("history_net") / datetime.datetime.now().strftime("%Y-%m-%dT%H-%M-%S")
     # save_dir.mkdir(parents=True)
 
-    history = PlayHistory(agent.save_dir / 'history_net')
+    save_dir = agent.save_dir / 'history_net'
+    save_dir = save_dir / datetime.datetime.now().strftime("%Y-%m-%dT%H-%M-%S")
+    save_dir.mkdir(parents=True)
+
+    history = PlayHistory(save_dir)
 
     agent.exploration_rate = 0
 
