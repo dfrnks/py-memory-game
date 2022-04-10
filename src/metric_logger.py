@@ -65,10 +65,10 @@ class MetricLogger:
             self.curr_ep_loss += loss
             self.curr_ep_q += q
             self.curr_ep_loss_length += 1
-            self.writer.add_scalar("Loss/train", loss, e)
+            self.writer.add_scalar("Loss", loss, e)
 
-        self.writer.add_scalar('Points/train', points, e)
-        self.writer.add_scalar('Rewards/train', self.curr_ep_reward, e)
+        self.writer.add_scalar('Points', points, e)
+        self.writer.add_scalar('Rewards', self.curr_ep_reward, e)
 
     def log_episode(self, e):
         """Mark end of episode"""
@@ -83,7 +83,7 @@ class MetricLogger:
         self.ep_avg_losses.append(ep_avg_loss)
         self.ep_avg_qs.append(ep_avg_q)
 
-        self.writer.add_scalar('NGames/train', self.curr_ep_length, e)
+        self.writer.add_scalar('NGames', self.curr_ep_length, e)
 
         self.init_episode()
 
