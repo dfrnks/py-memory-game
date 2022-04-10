@@ -101,7 +101,7 @@ def play_random_env(w, h, history: PlayHistory, i, j, show=False):
     history.record(games)
 
 
-def play_random(w, h, n, t, show=False):
+def play_random(w, h, n, t, save_dir, show=False):
     """
     :param w: Largura
     :param h: Altura
@@ -109,9 +109,10 @@ def play_random(w, h, n, t, show=False):
     :param t: Numero de threads, se t = 1 então não utiliza threads
     :return:
     """
-    save_dir = Path("history") / datetime.datetime.now().strftime("%Y-%m-%dT%H-%M-%S")
-    save_dir.mkdir(parents=True)
-    history = PlayHistory(save_dir)
+    # save_dir = Path("history") / datetime.datetime.now().strftime("%Y-%m-%dT%H-%M-%S")
+    # save_dir.mkdir(parents=True)
+
+    history = PlayHistory(save_dir / 'history_net')
 
     for j in range(int(n / t)):
         if t == 1:
@@ -127,23 +128,16 @@ def play_random(w, h, n, t, show=False):
                 threads[i].join(600)
 
 
-def play_with_network(ep=1, show=False):
+def play_with_network(agent, ep=1, show=False):
     w = 4
     h = 4
     env = MemoryGameEnv((w, h))
+    #
+    # save_dir = Path("history_net") / datetime.datetime.now().strftime("%Y-%m-%dT%H-%M-%S")
+    # save_dir.mkdir(parents=True)
 
-    save_dir = Path("history_net") / datetime.datetime.now().strftime("%Y-%m-%dT%H-%M-%S")
-    save_dir.mkdir(parents=True)
+    history = PlayHistory(agent.save_dir / 'history_net')
 
-    history = PlayHistory(save_dir)
-
-    agent = MemoryAgent(
-        state_dim=(env.action_space.n, env.action_space.n),
-        action_dim=env.action_space.n,
-        save_dir=save_dir
-    )
-
-    agent.load('checkpoints/memory_net.chkpt')
     agent.exploration_rate = 0
 
     for i in range(ep):
