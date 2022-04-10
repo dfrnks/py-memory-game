@@ -5,7 +5,6 @@ import uuid
 import threading
 import datetime
 
-
 from pathlib import Path
 
 from src import PlayHistory
@@ -17,10 +16,16 @@ def cls():
     os.system('cls' if os.name == 'nt' else 'clear')
 
 
+total_rewards = 0
+
+
 def playing_manually(env):
     position = input("Enter the X Y position (ex: 12):")
 
     table, rewards, done, info = env.step(int(position))
+
+    global total_rewards
+    total_rewards += rewards
 
     cls()
 
@@ -30,7 +35,7 @@ def playing_manually(env):
         cls()
         print(env.render())
 
-        print(f"Gaming complete, Total points: {info['points']}")
+        print(f"Gaming complete, Total points: {info['points']}, Total rewards: {total_rewards}")
 
         return
 
@@ -38,6 +43,16 @@ def playing_manually(env):
 
 
 def playing_manually_start():
+    # game_board_completed = [
+    #     102, 107, 106, 107,
+    #     104, 104, 100, 103,
+    #     100, 105, 102, 101,
+    #     105, 103, 106, 101
+    # ]
+    #
+    # game_board = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+    #
+    # env = MemoryGameEnv((4, 4), game_board_completed, game_board)
     env = MemoryGameEnv((4, 4))
     env.reset()
 
@@ -80,7 +95,8 @@ def play_random_env(w, h, history: PlayHistory, i, j, show=False):
             str(time.time())
         ])
 
-    print("--- {}-{} item. {} seconds. {} jogadas, {} Pontos ---".format(j, i, (time.time() - start_time), n_games, info['points']))
+    print("--- {}-{} item. {} seconds. {} jogadas, {} Pontos ---".format(j, i, (time.time() - start_time), n_games,
+                                                                         info['points']))
 
     history.record(games)
 
@@ -97,7 +113,7 @@ def play_random(w, h, n, t, show=False):
     save_dir.mkdir(parents=True)
     history = PlayHistory(save_dir)
 
-    for j in range(int(n/t)):
+    for j in range(int(n / t)):
         if t == 1:
             play_random_env(w, h, history, 1, j, show)
         else:
@@ -168,6 +184,7 @@ def play_with_network(ep=1, show=False):
                 str(time.time())
             ])
 
-        print("--- {}-{} item. {} seconds. {} jogadas, {} Pontos ---".format(0, i, (time.time() - start_time), n_games, info['points']))
+        print("--- {}-{} item. {} seconds. {} jogadas, {} Pontos ---".format(0, i, (time.time() - start_time), n_games,
+                                                                             info['points']))
 
         history.record(games)

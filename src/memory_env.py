@@ -46,8 +46,10 @@ def createGameBoard(width, height, character):
 class MemoryGameEnv(Env):
     metadata = {"render_modes": ["human"]}
 
-    def __init__(self, shape=(8, 8)):
+    def __init__(self, shape=(8, 8), game_board_completed=None, game_board=None):
         self.shape = shape
+        self.r_game_board_completed = game_board_completed
+        self.r_game_board = game_board
 
         self.reward_range = (-float("inf"), float("inf"))
 
@@ -161,7 +163,10 @@ class MemoryGameEnv(Env):
         self.num_errors = 0
         self.last_played = None
 
-        self.game_board_completed, self.game_board = createGameBoard(self.shape[0], self.shape[1], 0)
+        if self.r_game_board and self.r_game_board_completed:
+            self.game_board_completed, self.game_board = self.r_game_board_completed, self.r_game_board
+        else:
+            self.game_board_completed, self.game_board = createGameBoard(self.shape[0], self.shape[1], 0)
 
         return copy.deepcopy(self.game_board)
 
