@@ -174,8 +174,8 @@ def play_with_network(agent, env, ep=1, show=False):
 
             games.append([
                 str(id),
-                str(env.action_space.n),
-                str(env.action_space.n),
+                str(env.shape[0]),
+                str(env.shape[1]),
                 str(action),
                 str(reward),
                 str(done),
