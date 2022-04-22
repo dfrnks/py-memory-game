@@ -130,6 +130,5 @@ dmypy.json
 
 # IDE
 .idea
-checkpoints
 *.csv
 runs

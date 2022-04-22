@@ -9,8 +9,10 @@ class MemoryNet(nn.Module):
     mini cnn structure
     """
 
-    def __init__(self, input_dim, output_dim):
+    def __init__(self, input_dim, output_dim, device):
         super().__init__()
+
+        self.device = device
 
         h, w = input_dim
 
@@ -43,18 +45,16 @@ class MemoryNet(nn.Module):
         # )
 
         self.online = nn.Sequential(
-            nn.Linear(16, 128),
+            nn.Linear(16, 16),
             nn.ReLU(),
-            nn.Linear(128, 64),
+            nn.Linear(16, 16),
             nn.ReLU(),
-            nn.Linear(64, 32),
+            nn.Linear(16, 16),
             nn.ReLU(),
-            nn.Linear(32, 16)
+            nn.Linear(16, output_dim)
         )
 
-        device = "cuda" if torch.cuda.is_available() else "cpu"
-
-        self.online = self.online.to(device=device)
+        self.online = self.online.to(device=self.device)
 
         self.target = copy.deepcopy(self.online)
 

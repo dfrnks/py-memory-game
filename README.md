@@ -31,3 +31,29 @@ Para abrir o tensorboard para visualizar alguns graficos rode:
 ```
 tensorboard --logdir=runs
 ```
+
+## Network
+
+    Input -> 
+    nn.Linear(16, 128),
+    nn.ReLU(),
+    nn.Linear(128, 64),
+    nn.ReLU(),
+    nn.Linear(64, 32),
+    nn.ReLU(),
+    nn.Linear(32, output_dim)
+    -> Output
+
+## Hiperpameters
+
+    lr=0.001,
+    max_memory_size=1000000,
+    batch_size=64,
+    gamma=0.9,
+    exploration_rate=1,
+    exploration_rate_decay=0.99999999,
+    exploration_rate_min=0.1,
+    save_every=5e5,
+    burnin=1e4,
+    learn_every=3,
+    sync_every=1e4,
